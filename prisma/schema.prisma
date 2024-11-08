@@ -1,0 +1,48 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["jsonProtocol"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  novels    Novel[]  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Novel {
+  id         Int          @id @default(autoincrement())
+  title      String
+  content    String    
+  authorId   Int       
+  author     User        @relation(fields: [authorId], references: [id])
+  genres     NovelGenre[] // Relación inversa con NovelGenre
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
+
+model Genre {
+  id       Int          @id @default(autoincrement())
+  name     String       @unique
+  novels   NovelGenre[] // Relación inversa con NovelGenre
+}
+
+model NovelGenre {
+  novelId Int
+  genreId Int
+  novel   Novel @relation(fields: [novelId], references: [id])
+  genre   Genre @relation(fields: [genreId], references: [id])
+
+  @@id([novelId, genreId]) 
+}
