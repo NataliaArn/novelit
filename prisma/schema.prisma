@@ -16,7 +16,7 @@ model User {
   username  String   @unique
   email     String   @unique
   password  String
-  novels    Novel[]  
+  novels    Novel[]  // un usuario puede tener muchas novelas
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -26,8 +26,8 @@ model Novel {
   title      String
   content    String    
   authorId   Int       
-  author     User        @relation(fields: [authorId], references: [id])
-  genres     NovelGenre[] // Relación inversa con NovelGenre
+  author     User        @relation(fields: [authorId], references: [id]) //hace referencia al id del autor
+  genres     NovelGenre[] //una novela puede tener muchos generos
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
 }
@@ -35,11 +35,11 @@ model Novel {
 model Genre {
   id       Int          @id @default(autoincrement())
   name     String       @unique
-  novels   NovelGenre[] // Relación inversa con NovelGenre
+  novels   NovelGenre[] //un genero puede estar en muchas novelas
 }
 
 model NovelGenre {
-  novelId Int
+  novelId Int //tabla intermediaria
   genreId Int
   novel   Novel @relation(fields: [novelId], references: [id])
   genre   Genre @relation(fields: [genreId], references: [id])
