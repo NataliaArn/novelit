@@ -1,4 +1,5 @@
 "use client";
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function ProfileButtons() {
@@ -6,10 +7,8 @@ export default function ProfileButtons() {
 
   const handleLogout = async () => {
     try {
-      // Llama al endpoint de logout
-      await fetch("/api/auth/logout", { method: "POST" });
+      await signOut({ redirect: false });
 
-      // Redirige al login
       router.push("/login");
     } catch (error) {
       console.error("Logout failed:", error);

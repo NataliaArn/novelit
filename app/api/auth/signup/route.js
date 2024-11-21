@@ -1,37 +1,73 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import prisma from "@/lib/prisma";
-export async function POST(req) {
-  try {
-    const { username, email, password } = await req.json();
 
-    // Verificar si el usuario ya existe
-    const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser) {
+export async function POST(request) {
+  try {
+    // Obtener los datos del body de la solicitud
+    const data = await request.json();
+
+    // Verificar si el correo electrónico ya existe
+    const userFound = await prisma.user.findUnique({
+      where: {
+        email: data.email,
+      },
+    });
+
+    if (userFound) {
       return NextResponse.json(
-        { error: "User already exists" },
-        { status: 400 }
+        {
+          message: "Email already exists",
+        },
+        {
+          status: 400,
+        }
       );
     }
 
-    // Hashear contraseña
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Verificar si el nombre de usuario ya existe
+    const usernameFound = await prisma.user.findUnique({
+      where: {
+        username: data.username,
+      },
+    });
 
-    // Crear usuario
-    const user = await prisma.user.create({
+    if (usernameFound) {
+      return NextResponse.json(
+        {
+          message: "Username already exists",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    // Encriptar la contraseña
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    // Crear un nuevo usuario en la base de datos
+    const newUser = await prisma.user.create({
       data: {
-        username,
-        email,
+        username: data.username,
+        email: data.email,
         password: hashedPassword,
       },
     });
 
-    return NextResponse.json({ message: "User created successfully", user });
+    // Excluir la contraseña del objeto de respuesta
+    const { password, ...userWithoutPassword } = newUser;
+
+    // Devolver los datos del usuario sin la contraseña
+    return NextResponse.json(userWithoutPassword);
   } catch (error) {
-    console.error(error);
     return NextResponse.json(
-      { error: "Something went wrong" },
-      { status: 500 }
+      {
+        message: error.message,
+      },
+      {
+        status: 500,
+      }
     );
   }
 }

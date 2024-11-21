@@ -1,19 +1,23 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 
 export default function SignupForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm(); // Usar useForm
+  const [error, setError] = useState(""); // Para manejar errores globales
   const router = useRouter();
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    setError("");
+  // Enviar los datos del formulario
+  const onSubmit = async (data) => {
+    setError(""); // Limpiar errores previos
 
-    if (password !== confirmPassword) {
+    if (data.password !== data.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
@@ -22,14 +26,14 @@ export default function SignupForm() {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: data.email, password: data.password }),
       });
 
       if (res.ok) {
-        router.push("/login"); // Redirige al login al final
+        router.push("/login"); // Redirige al login
       } else {
-        const data = await res.json();
-        setError(data.error || "An error occurred");
+        const responseData = await res.json();
+        setError(responseData.error || "An error occurred");
       }
     } catch (error) {
       setError("Something went wrong");
@@ -37,39 +41,53 @@ export default function SignupForm() {
   };
 
   return (
-    <form onSubmit={handleSignup} className="bg-white p-6 rounded shadow-md">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="bg-white p-6 rounded shadow-md"
+    >
       <h2 className="text-2xl font-bold mb-4">Sign Up</h2>
       {error && <p className="text-red-500">{error}</p>}
+
       <div className="mb-4">
         <label>Email</label>
         <input
           type="email"
+          {...register("email", { required: "Email is required" })}
           className="border p-2 w-full"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
         />
+        {errors.email && (
+          <p className="text-red-500 text-xs">{errors.email.message}</p>
+        )}
       </div>
+
       <div className="mb-4">
         <label>Password</label>
         <input
           type="password"
+          {...register("password", { required: "Password is required" })}
           className="border p-2 w-full"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
         />
+        {errors.password && (
+          <p className="text-red-500 text-xs">{errors.password.message}</p>
+        )}
       </div>
+
       <div className="mb-4">
         <label>Confirm Password</label>
         <input
           type="password"
+          {...register("confirmPassword", {
+            required: "Confirm password is required",
+          })}
           className="border p-2 w-full"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
         />
+        {errors.confirmPassword && (
+          <p className="text-red-500 text-xs">
+            {errors.confirmPassword.message}
+          </p>
+        )}
       </div>
+
       <button className="bg-blue-500 text-white p-2 rounded w-full">
         Sign Up
       </button>
