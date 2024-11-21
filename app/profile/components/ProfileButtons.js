@@ -8,8 +8,7 @@ export default function ProfileButtons() {
   const handleLogout = async () => {
     try {
       await signOut({ redirect: false });
-
-      router.push("/login");
+      router.push("/auth/login");
     } catch (error) {
       console.error("Logout failed:", error);
     }
