@@ -1,5 +1,5 @@
-import Header from "@/components/Header";
-import RecentNovels from "@/components/RecentNovels";
+import Header from "./components/Header";
+import RecentNovels from "./components/RecentNovels";
 
 export default function HomePage() {
   return (
