@@ -7,13 +7,14 @@ export default function ProfileButtons() {
 
   const handleLogout = async () => {
     try {
-      await signOut({ redirect: false });
+      await signOut({ redirect: false }); // Llama a la función de NextAuth
       router.push("/auth/login");
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error("Error al cerrar sesión:", error);
     }
   };
 
+  // Todo: implementar botones
   return (
     <div className="flex flex-col items-center gap-4">
       <button

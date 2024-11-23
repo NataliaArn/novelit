@@ -3,31 +3,63 @@ import { NextResponse } from "next/server";
 
 export async function middleware(req) {
   const token = await getToken({ req, secret: process.env.JWT_SECRET });
-  const { pathname } = req.nextUrl;
 
-  // Define rutas públicas
-  const publicRoutes = ["/login", "/signup"];
-  const isPublicRoute = publicRoutes.includes(pathname);
+  // Rutas protegidas: Crear, Editar, Eliminar novelas, Perfil
+  const protectedRoutes = [
+    "/novels/create",
+    "/novels/[id]/edit",
+    "/profile",
+    "/api/novels",
+  ];
 
-  // Si no hay token y no es una ruta pública, redirige al login
-  if (!token && !isPublicRoute) {
-    return NextResponse.redirect(new URL("/login", req.url));
+  // Rutas públicas de login y signup
+  const publicRoutes = ["/auth/login", "/auth/signup"];
+
+  // Verificar si la ruta es una ruta protegida
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    req.nextUrl.pathname.startsWith(route)
+  );
+
+  // Verificar si la ruta es una ruta pública (login/signup)
+  const isPublicRoute = publicRoutes.some((route) =>
+    req.nextUrl.pathname.startsWith(route)
+  );
+
+  // Verificar si es una solicitud POST a la API de novelas
+  const isNovelCreationAPI =
+    req.nextUrl.pathname.startsWith("/api/novels") && req.method === "POST";
+
+  // Si no hay token y la ruta es protegida, redirigir al login
+  if (!token && isProtectedRoute) {
+    return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
-  // Si hay token y es una ruta pública, redirige al perfil
+  // Si ya hay un token y el usuario intenta acceder a login/signup, redirigir al perfil
   if (token && isPublicRoute) {
     return NextResponse.redirect(new URL("/profile", req.url));
   }
 
-  // Permite continuar si ninguna regla de redirección aplica
+  // Protección específica para la API de creación de novelas
+  if (isNovelCreationAPI && !token) {
+    return new NextResponse(
+      JSON.stringify({ error: "Authentication required to create novels" }),
+      {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    "/profile", // Rutas protegidas
-    "/api/protected-route", // API protegida
-    "/login", // Ruta pública
-    "/signup", // Ruta pública
+    "/novels/create",
+    "/novels/[id]/edit",
+    "/profile",
+    "/auth/login",
+    "/auth/signup",
+    "/api/novels/:path*", // Add API routes to the matcher
   ],
 };

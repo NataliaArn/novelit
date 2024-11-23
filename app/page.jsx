@@ -1,6 +1,16 @@
-import { redirect } from "next/navigation";
+import Header from "@/components/Header";
+import RecentNovels from "@/components/RecentNovels";
 
-export default function Home() {
-  redirect("/auth/login");
-  return null;
+export default function HomePage() {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-1 p-6 bg-gray-100">
+        <h1 className="text-2xl font-bold text-center mb-6">
+          Novelas Recientes
+        </h1>
+        <RecentNovels />
+      </main>
+    </div>
+  );
 }
