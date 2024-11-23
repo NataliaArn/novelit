@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { auth } from "@/lib/auth";
+import { getSessionAuth } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
@@ -38,7 +38,7 @@ export async function GET(request) {
 // Solicitud POST para crear géneros
 export async function POST(request) {
   try {
-    const session = await auth();
+    const session = await getSessionAuth();
 
     if (!session?.user?.isAdmin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
