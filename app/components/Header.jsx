@@ -23,7 +23,7 @@ export default function Header() {
         Novelit
       </h1>
       <div className="flex gap-4 items-center">
-        {!session ? (
+        {session == undefined ? (
           <button
             className="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600"
             onClick={() => signIn()}
