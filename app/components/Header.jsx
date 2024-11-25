@@ -1,53 +1,44 @@
-"use client";
-import { useSession, signIn, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../api/auth/[...nextauth]";
+import { signOut } from "next-auth/react";
 
-export default function Header() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-
-  if (status === "loading") {
-    return (
-      <header className="bg-gray-800 text-white p-4">
-        <p>Cargando...</p>
-      </header>
-    );
-  }
+async function Header() {
+  const session = await getServerSession(authOptions);
 
   return (
-    <header className="bg-gray-800 text-white p-4 flex justify-between items-center">
-      <h1
-        className="text-xl font-bold cursor-pointer"
-        onClick={() => router.push("/")}
-      >
-        Novelit
-      </h1>
-      <div className="flex gap-4 items-center">
-        {!session ? (
-          <button
-            className="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600"
-            onClick={() => signIn()}
-          >
-            Iniciar sesión
-          </button>
+    <nav className="flex justify-between items-center bg-gray-950 text-white px-24 py-3">
+      <h1 className="text-xl font-bold">NextAuth</h1>
+      <ul className="flex gap-x-2">
+        {!session?.user ? (
+          <>
+            <li>
+              <Link href="/">Home</Link>
+            </li>
+            <li>
+              <Link href="/auth/login">Login</Link>
+            </li>
+            <li>
+              <Link href="/auth/signup">Sign up</Link>
+            </li>
+          </>
         ) : (
           <>
-            <p className="text-sm">Hola, {session.user.name}</p>
-            <button
-              className="bg-green-500 px-4 py-2 rounded hover:bg-green-600"
-              onClick={() => alert("Subir novela")} // TODO: Implementar función de subir
-            >
-              Upload
-            </button>
-            <button
-              className="bg-red-500 px-4 py-2 rounded hover:bg-red-600"
-              onClick={() => signOut()}
-            >
-              Cerrar sesión
-            </button>
+            <li>
+              <Link href="/">Upload</Link>
+            </li>
+            <li>
+              <button
+                onClick={() => signOut()}
+                className="text-blue-500 hover:underline"
+              >
+                Logout
+              </button>
+            </li>
           </>
         )}
-      </div>
-    </header>
+      </ul>
+    </nav>
   );
 }
+export default Header;

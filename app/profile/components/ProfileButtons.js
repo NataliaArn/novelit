@@ -1,20 +1,24 @@
 "use client";
+
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function ProfileButtons() {
   const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     try {
-      await signOut({ redirect: false }); // Llama a la función de NextAuth
+      await signOut({ redirect: false });
       router.push("/auth/login");
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
+      setIsLoggingOut(false);
     }
   };
 
-  // Todo: implementar botones
   return (
     <div className="flex flex-col items-center gap-4">
       <button
@@ -36,10 +40,15 @@ export default function ProfileButtons() {
         Buscar novelas
       </button>
       <button
-        className="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600"
+        className={`px-4 py-2 rounded shadow ${
+          isLoggingOut
+            ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+            : "bg-red-500 text-white hover:bg-red-600"
+        }`}
         onClick={handleLogout}
+        disabled={isLoggingOut}
       >
-        Cerrar sesión
+        {isLoggingOut ? "Cerrando sesión..." : "Cerrar sesión"}
       </button>
     </div>
   );

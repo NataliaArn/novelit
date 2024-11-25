@@ -2,27 +2,33 @@
 import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-export default function LoginPage() {
+function LoginPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm();
   const router = useRouter();
+  const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = handleSubmit(async (data) => {
+    setIsSubmitting(true); // Inicio del envío
     const res = await signIn("credentials", {
       email: data.email,
       password: data.password,
       redirect: false,
     });
 
-    if (res?.error) {
-      alert("Correo o contraseña incorrectos.");
+    if (res.error) {
+      setError(res.error);
     } else {
-      router.push("/profile");
+      router.push("/");
+      router.refresh();
     }
+    setIsSubmitting(false); // Fin del envío
   });
 
   return (
@@ -32,6 +38,8 @@ export default function LoginPage() {
         className="bg-white p-6 rounded shadow-md w-full max-w-md"
       >
         <h2 className="text-2xl font-bold mb-4">Iniciar sesión</h2>
+
+        {error && <p className="text-red-500 mb-4">{error}</p>}
 
         <div className="mb-4">
           <label
@@ -108,3 +116,4 @@ export default function LoginPage() {
     </div>
   );
 }
+export default LoginPage;

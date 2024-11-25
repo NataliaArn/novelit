@@ -1,59 +1,50 @@
 "use client";
-
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function SignupPage() {
+function SignupPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
     watch,
+    formState: { errors },
   } = useForm();
-  const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false); // Para evitar múltiples envíos
-  const [error, setError] = useState(""); // Para manejar errores globales
-
-  // Validación de confirmación de contraseña
   const password = watch("password");
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit = async (data) => {
-    setError("");
-    setIsSubmitting(true); // Evitar múltiples envíos
-
-    try {
-      const res = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-        }),
-      });
-
-      if (res.ok) {
-        router.push("/login"); // Redirige al login después del registro exitoso
-      } else {
-        const responseData = await res.json();
-        setError(responseData.message || "An error occurred");
-      }
-    } catch (err) {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setIsSubmitting(false); // Reactivar el botón
+  const onSubmit = handleSubmit(async (data) => {
+    if (data.password !== data.confirmPassword) {
+      return alert("Las contraseñas no coinciden");
     }
-  };
+
+    setIsSubmitting(true); // Inicio del envío
+
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      body: JSON.stringify({
+        username: data.username,
+        email: data.email,
+        password: data.password,
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (res.ok) {
+      router.push("/auth/login");
+    }
+
+    setIsSubmitting(false); // Fin del envío
+  });
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={onSubmit}
         className="bg-white p-6 rounded shadow-md w-full max-w-md"
       >
         <h2 className="text-2xl font-bold mb-4">Crear cuenta</h2>
-
-        {error && <p className="text-red-500 mb-4">{error}</p>}
 
         <div className="mb-4">
           <label
@@ -154,3 +145,4 @@ export default function SignupPage() {
     </div>
   );
 }
+export default SignupPage;

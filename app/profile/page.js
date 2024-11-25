@@ -1,25 +1,13 @@
-"use client";
-
-import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../api/auth/[...nextauth]";
 import ProfileButtons from "./components/ProfileButtons";
+import { redirect } from "next/navigation";
 
-export default function ProfilePage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-
-  if (status === "loading") {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p>Cargando...</p>
-      </div>
-    );
-  }
+export default async function ProfilePage() {
+  const session = await getServerSession(authOptions);
 
   if (!session) {
-    // Redirigir si no está autenticado
-    router.push("/auth/login");
-    return null;
+    redirect("/auth/login");
   }
 
   return (
@@ -29,7 +17,7 @@ export default function ProfilePage() {
 
         <div className="mb-4">
           <p className="text-sm text-gray-700">
-            {session.user.username || "User"}
+            {session.user.username || session.user.email || "Usuario"}
           </p>
         </div>
 
