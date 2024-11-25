@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../api/auth/[...nextauth]";
+import { authOptions } from "@/app/api/auth/[...nextauth]";
 import { signOut } from "next-auth/react";
 
 async function Header() {
