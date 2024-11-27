@@ -2,6 +2,15 @@ import { getSession } from "next-auth/react";
 import { NextResponse } from "next/server";
 
 export const config = {
+  matcher: [
+    "/",
+    "/novels/create",
+    "/novels/[id]/edit",
+    "/profile",
+    "/auth/login",
+    "/auth/signup",
+    "/api/novels/:path*",
+  ],
   runtime: "nodejs", // Especificamos que se ejecute en Node.js Runtime
 };
 
