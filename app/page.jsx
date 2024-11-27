@@ -1,6 +1,6 @@
 "use client";
-import Header from "./components/Header";
-import RecentNovels from "./components/RecentNovels";
+import Header from "@/app/components/Header";
+import RecentNovels from "@/app/components/RecentNovels";
 
 export default function HomePage() {
   return (

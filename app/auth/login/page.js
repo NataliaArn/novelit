@@ -106,7 +106,7 @@ function LoginPage() {
         <div className="mt-4 text-center">
           <button
             type="button"
-            onClick={() => router.push("/signup")}
+            onClick={() => router.push("/auth/signup")}
             className="text-blue-500 text-sm hover:underline"
           >
             No tienes una cuenta? Regístrate
