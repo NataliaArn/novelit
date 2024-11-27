@@ -1,18 +1,16 @@
 import { getSession } from "next-auth/react";
 import { NextResponse } from "next/server";
 
+export const config = {
+  runtime: "nodejs", // Especificamos que se ejecute en Node.js Runtime
+};
+
 export async function middleware(req) {
   const session = await getSession({ req });
 
-  // Rutas públicas y protegidas
   const ROUTES = {
     PUBLIC: ["/", "/auth/login", "/auth/signup"],
-    PROTECTED: [
-      "/novels/create",
-      "/novels/[id]/edit",
-      "/profile",
-      "/api/novels",
-    ],
+    PROTECTED: ["/novels/create", "/profile", "/api/novels"],
   };
 
   const isProtectedRoute = ROUTES.PROTECTED.some((route) =>
@@ -22,7 +20,6 @@ export async function middleware(req) {
     req.nextUrl.pathname.startsWith(route)
   );
 
-  // Verificar si es una solicitud a la API de novelas y su método
   const isNovelAPI = req.nextUrl.pathname.startsWith("/api/novels");
   const isGETMethod = req.method === "GET";
   const isNonGETMethod = ["POST", "PUT", "DELETE"].includes(req.method);
@@ -48,27 +45,16 @@ export async function middleware(req) {
     );
   }
 
-  // Si no hay sesión y la ruta es protegida, redirigir al login
+  // Si no hay session y la ruta es protegida, redirigir al login
   if (!session && isProtectedRoute) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
+  // Si ya hay un session y el usuario intenta acceder a login/signup, redirigir al perfil
   if (session && isPublicRoute) {
-    const redirectTo = req.nextUrl.pathname;
-    return NextResponse.redirect(new URL(redirectTo, req.url));
+    const redirectTo = req.nextUrl.pathname; // Guardamos la URL de destino
+    return NextResponse.redirect(new URL(redirectTo, req.url)); // Redirigimos a la página que el usuario quería
   }
 
   return NextResponse.next();
 }
-
-export const config = {
-  matcher: [
-    "/",
-    "/novels/create",
-    "/novels/[id]/edit",
-    "/profile",
-    "/auth/login",
-    "/auth/signup",
-    "/api/novels/:path*",
-  ],
-};
