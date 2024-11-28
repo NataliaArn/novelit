@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 export async function POST(request) {
   try {
     const data = await request.json();
+    console.log("Request data:", data);
 
     const userFound = await prisma.user.findUnique({
       where: { email: data.email },
@@ -41,6 +42,7 @@ export async function POST(request) {
     const { password: _, ...user } = newUser;
     return NextResponse.json(user);
   } catch (error) {
+    console.error("Error creating user:", error);
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }

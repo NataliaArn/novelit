@@ -19,23 +19,33 @@ function SignupPage() {
       return alert("Las contraseñas no coinciden");
     }
 
-    setIsSubmitting(true); // Inicio del envío
+    setIsSubmitting(true);
 
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      body: JSON.stringify({
-        username: data.username,
-        email: data.email,
-        password: data.password,
-      }),
-      headers: { "Content-Type": "application/json" },
-    });
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        body: JSON.stringify({
+          username: data.username,
+          email: data.email,
+          password: data.password,
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
 
-    if (res.ok) {
-      router.push("/auth/login");
+      const result = await res.json();
+
+      if (res.ok) {
+        alert("Cuenta creada exitosamente. Redirigiendo...");
+        router.push("/auth/login");
+      } else {
+        alert(result.message || "Error creando cuenta");
+      }
+    } catch (error) {
+      console.error("Error al crear cuenta:", error);
+      alert("Ocurrió un error inesperado");
     }
 
-    setIsSubmitting(false); // Fin del envío
+    setIsSubmitting(false);
   });
 
   return (
