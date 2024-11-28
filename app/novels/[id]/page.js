@@ -1,3 +1,4 @@
+"use client";
 import NovelDetail from "./components/NovelDetail";
 import NovelChapters from "./components/NovelChapters";
 
