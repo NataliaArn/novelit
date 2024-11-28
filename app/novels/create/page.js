@@ -2,19 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
 
 export default function CreateNovelPage() {
   const router = useRouter();
-  const { status, data: session } = useSession();
+  const [session, setSession] = useState(null);
 
-  // Redirigir si no está autenticado o la sesión se está cargando
   useEffect(() => {
-    if (status === "loading") return; // No hacer nada mientras se carga la sesión
-    if (status === "unauthenticated" || !session) {
-      router.push("/auth/login"); // Redirigir a login si no está autenticado
+    async function fetchSession() {
+      const sessionData = await getSession();
+      setSession(sessionData);
     }
-  }, [status, session, router]);
+    fetchSession();
+  }, []);
 
   const [title, setTitle] = useState("");
   const [synopsis, setSynopsis] = useState("");
@@ -97,12 +97,18 @@ export default function CreateNovelPage() {
     }
   };
 
-  if (status === "loading") {
+  // Redirigir si la sesión aún no está disponible
+  if (session === null) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="spinner">Loading...</div>
       </div>
     );
+  }
+
+  if (!session) {
+    router.push("/auth/login"); // Redirigir a login si no hay sesión
+    return null;
   }
 
   return (
