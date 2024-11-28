@@ -1,22 +1,13 @@
-import { getSession } from "next-auth/react";
+import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 
-export const config = {
-  matcher: [
-    "/",
-    "/novels/create",
-    "/novels/[id]/edit",
-    "/profile",
-    "/auth/login",
-    "/auth/signup",
-    "/api/novels/:path*",
-  ],
-  runtime: "nodejs", // Especificamos que se ejecute en Node.js Runtime
-};
+// Configuración del secreto JWT
+const JWT_SECRET = process.env.NEXTAUTH_SECRET;
 
 export async function middleware(req) {
-  const session = await getSession({ req });
+  const token = await getToken({ req, secret: JWT_SECRET });
 
+  // Rutas públicas y protegidas
   const ROUTES = {
     PUBLIC: ["/", "/auth/login", "/auth/signup"],
     PROTECTED: ["/novels/create", "/profile", "/api/novels"],
@@ -44,7 +35,7 @@ export async function middleware(req) {
   }
 
   // Bloquear solicitudes no GET en /api/novels sin autenticación
-  if (isNovelAPI && isNonGETMethod && !session) {
+  if (isNovelAPI && isNonGETMethod && !token) {
     return new NextResponse(
       JSON.stringify({ error: "Authentication required for this action" }),
       {
@@ -54,16 +45,22 @@ export async function middleware(req) {
     );
   }
 
-  // Si no hay session y la ruta es protegida, redirigir al login
-  if (!session && isProtectedRoute) {
+  // Si no hay token y la ruta es protegida, redirigir al login
+  if (!token && isProtectedRoute) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
-  }
-
-  // Si ya hay un session y el usuario intenta acceder a login/signup, redirigir al perfil
-  if (session && isPublicRoute) {
-    const redirectTo = req.nextUrl.pathname; // Guardamos la URL de destino
-    return NextResponse.redirect(new URL(redirectTo, req.url)); // Redirigimos a la página que el usuario quería
   }
 
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: [
+    "/",
+    "/novels/create",
+    "/novels/[id]/edit",
+    "/profile",
+    "/auth/login",
+    "/auth/signup",
+    "/api/novels/:path*",
+  ],
+};
