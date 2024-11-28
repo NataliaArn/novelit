@@ -6,7 +6,15 @@ import { useSession } from "next-auth/react";
 
 export default function CreateNovelPage() {
   const router = useRouter();
-  const { status } = useSession();
+  const { status, data: session } = useSession();
+
+  // Redirigir si no está autenticado o la sesión se está cargando
+  useEffect(() => {
+    if (status === "loading") return; // No hacer nada mientras se carga la sesión
+    if (status === "unauthenticated" || !session) {
+      router.push("/auth/login"); // Redirigir a login si no está autenticado
+    }
+  }, [status, session, router]);
 
   const [title, setTitle] = useState("");
   const [synopsis, setSynopsis] = useState("");
@@ -15,13 +23,6 @@ export default function CreateNovelPage() {
 
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    // Redirigir si no está autenticado
-    if (status === "unauthenticated") {
-      router.push("/auth/login");
-    }
-  }, [status, router]);
 
   useEffect(() => {
     async function fetchGenres() {
@@ -186,7 +187,7 @@ export default function CreateNovelPage() {
             disabled={isSubmitting}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
           >
-            {isSubmitting ? "Creando..." : "Novela creada"}
+            {isSubmitting ? "Creando..." : "Crear novela"}
           </button>
         </div>
       </form>
