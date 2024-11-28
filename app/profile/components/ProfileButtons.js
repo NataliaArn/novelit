@@ -23,7 +23,7 @@ export default function ProfileButtons() {
     <div className="flex flex-col items-center gap-4">
       <button
         className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
-        onClick={() => alert("Ir a escribir una novela")}
+        onClick={() => router.push("/novels/create")}
       >
         Escribir una novela
       </button>

@@ -40,6 +40,7 @@ export const authOptions = {
           id: userFound.id,
           name: userFound.username,
           email: userFound.email,
+          isAdmin: userFound.isAdmin,
         };
       },
     }),

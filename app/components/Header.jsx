@@ -35,7 +35,10 @@ export default function Header() {
         ) : (
           <>
             <li>
-              <Link href="/">Upload</Link>
+              <Link href="/novels/create">Upload</Link>
+            </li>
+            <li>
+              <Link href="/profile">Profile</Link>
             </li>
             <li>
               <button

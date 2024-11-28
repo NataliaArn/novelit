@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getSession } from "next-auth/react";
 
 const MAX_TITLE_LENGTH = 100;
 const MAX_SYNOPSIS_LENGTH = 500;
@@ -62,7 +63,6 @@ export async function GET(request) {
       },
     });
 
-    // Retornar respuesta con headers de caché optimizados
     return NextResponse.json(
       {
         novels,
@@ -84,6 +84,171 @@ export async function GET(request) {
     console.error("Error al obtener novelas:", error);
     return NextResponse.json(
       { error: "Error al cargar las novelas" },
+      { status: 500 }
+    );
+  }
+}
+
+// Método POST para crear una novela
+export async function POST(request) {
+  try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const { title, synopsis, genres } = await request.json();
+
+    // Validaciones
+    if (!title || !synopsis || !genres || genres.length === 0) {
+      return NextResponse.json(
+        { message: "Title, synopsis, and at least one genre are required" },
+        { status: 400 }
+      );
+    }
+
+    if (title.length > MAX_TITLE_LENGTH) {
+      return NextResponse.json(
+        { message: `Title cannot exceed ${MAX_TITLE_LENGTH} characters` },
+        { status: 400 }
+      );
+    }
+
+    if (synopsis.length > MAX_SYNOPSIS_LENGTH) {
+      return NextResponse.json(
+        { message: `Synopsis cannot exceed ${MAX_SYNOPSIS_LENGTH} characters` },
+        { status: 400 }
+      );
+    }
+
+    const newNovel = await prisma.novel.create({
+      data: {
+        title,
+        synopsis,
+        authorId: session.user.id,
+        genres: {
+          connect: genres.map((genreId) => ({ id: genreId })),
+        },
+      },
+    });
+
+    return NextResponse.json(newNovel, { status: 201 });
+  } catch (error) {
+    console.error("Error creating novel:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
+// Método UPDATE para actualizar una novela
+export async function PUT(request) {
+  try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const { novelId, title, synopsis, genres } = await request.json();
+
+    // Validaciones
+    if (!novelId || !title || !synopsis || !genres || genres.length === 0) {
+      return NextResponse.json(
+        {
+          message:
+            "NovelId, title, synopsis, and at least one genre are required",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (title.length > MAX_TITLE_LENGTH) {
+      return NextResponse.json(
+        { message: `Title cannot exceed ${MAX_TITLE_LENGTH} characters` },
+        { status: 400 }
+      );
+    }
+
+    if (synopsis.length > MAX_SYNOPSIS_LENGTH) {
+      return NextResponse.json(
+        { message: `Synopsis cannot exceed ${MAX_SYNOPSIS_LENGTH} characters` },
+        { status: 400 }
+      );
+    }
+
+    // Verificar si la novela existe
+    const novel = await prisma.novel.findUnique({ where: { id: novelId } });
+
+    if (!novel) {
+      return NextResponse.json({ message: "Novel not found" }, { status: 404 });
+    }
+
+    // Verificar si el usuario autenticado es el autor o admin
+    if (novel.authorId !== session.user.id && !session.user.isAdmin) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 403 });
+    }
+
+    const updatedNovel = await prisma.novel.update({
+      where: { id: novelId },
+      data: {
+        title,
+        synopsis,
+        genres: {
+          set: genres.map((genreId) => ({ id: genreId })),
+        },
+      },
+    });
+
+    return NextResponse.json(updatedNovel);
+  } catch (error) {
+    console.error("Error updating novel:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
+// Método DELETE
+export async function DELETE(request) {
+  try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const { novelId } = await request.json();
+
+    if (!novelId) {
+      return NextResponse.json(
+        { message: "NovelId is required" },
+        { status: 400 }
+      );
+    }
+
+    // Verificar si la novela existe
+    const novel = await prisma.novel.findUnique({ where: { id: novelId } });
+
+    if (!novel) {
+      return NextResponse.json({ message: "Novel not found" }, { status: 404 });
+    }
+
+    // Verificar si el usuario autenticado es el autor o un admin
+    if (novel.authorId !== session.user.id && !session.user.isAdmin) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 403 });
+    }
+
+    // Eliminar la novela
+    await prisma.novel.delete({
+      where: { id: novelId },
+    });
+
+    return NextResponse.json({ message: "Novel deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting novel:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
       { status: 500 }
     );
   }
