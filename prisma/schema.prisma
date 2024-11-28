@@ -13,7 +13,6 @@ model User {
   username  String   @unique
   email     String   @unique
   password  String
-  image     String?  // Implementar o quitar en el futuro
   isAdmin   Boolean  @default(false) // Distinción entre usuario regular y admin
   sessions  Session[] // Relación con la tabla de sesiones
   createdAt DateTime @default(now())

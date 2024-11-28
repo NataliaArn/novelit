@@ -56,6 +56,35 @@ function SignupPage() {
       >
         <h2 className="text-2xl font-bold mb-4">Crear cuenta</h2>
 
+        {/* Campo para username */}
+        <div className="mb-4">
+          <label
+            htmlFor="username"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Nombre de usuario
+          </label>
+          <input
+            id="username"
+            type="text"
+            className="border p-2 w-full rounded"
+            {...register("username", {
+              required: "El nombre de usuario es obligatorio",
+              minLength: {
+                value: 3,
+                message:
+                  "El nombre de usuario debe tener al menos 3 caracteres",
+              },
+            })}
+          />
+          {errors.username && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors.username.message}
+            </p>
+          )}
+        </div>
+
+        {/* Campo para email */}
         <div className="mb-4">
           <label
             htmlFor="email"
@@ -80,6 +109,7 @@ function SignupPage() {
           )}
         </div>
 
+        {/* Campo para password */}
         <div className="mb-4">
           <label
             htmlFor="password"
@@ -106,6 +136,7 @@ function SignupPage() {
           )}
         </div>
 
+        {/* Campo para confirmPassword */}
         <div className="mb-4">
           <label
             htmlFor="confirmPassword"
