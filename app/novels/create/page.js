@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 
 export default function CreateNovelPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
 
   const [title, setTitle] = useState("");
   const [synopsis, setSynopsis] = useState("");
@@ -15,6 +15,13 @@ export default function CreateNovelPage() {
 
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    // Redirigir si no está autenticado
+    if (status === "unauthenticated") {
+      router.push("/auth/login");
+    }
+  }, [status, router]);
 
   useEffect(() => {
     async function fetchGenres() {
@@ -30,12 +37,6 @@ export default function CreateNovelPage() {
     }
     fetchGenres();
   }, []);
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/login");
-    }
-  }, [status, router]);
 
   const toggleGenre = (genreId) => {
     setSelectedGenres((prev) =>

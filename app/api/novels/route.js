@@ -92,14 +92,17 @@ export async function GET(request) {
 // Método POST para crear una novela
 export async function POST(request) {
   try {
+    // Obtener la sesión del usuario
     const session = await getSession();
     if (!session) {
+      // Si no hay sesión, responder con un error de autenticación
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    // Obtener los datos del cuerpo de la solicitud
     const { title, synopsis, genres } = await request.json();
 
-    // Validaciones
+    // Validación de los datos
     if (!title || !synopsis || !genres || genres.length === 0) {
       return NextResponse.json(
         { message: "Title, synopsis, and at least one genre are required" },
@@ -121,17 +124,19 @@ export async function POST(request) {
       );
     }
 
+    // Crear la nueva novela en la base de datos
     const newNovel = await prisma.novel.create({
       data: {
         title,
         synopsis,
-        authorId: session.user.id,
+        authorId: session.user.id, // Asociar el authorId desde la sesión
         genres: {
-          connect: genres.map((genreId) => ({ id: genreId })),
+          connect: genres.map((genreId) => ({ id: genreId })), // Conectar los géneros seleccionados
         },
       },
     });
 
+    // Retornar la nueva novela como respuesta exitosa
     return NextResponse.json(newNovel, { status: 201 });
   } catch (error) {
     console.error("Error creating novel:", error);

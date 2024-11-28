@@ -1,52 +1,40 @@
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 
-// Configuración del secreto JWT
 const JWT_SECRET = process.env.NEXTAUTH_SECRET;
 
 export async function middleware(req) {
   const token = await getToken({ req, secret: JWT_SECRET });
 
-  // Rutas públicas y protegidas
-  const ROUTES = {
-    PUBLIC: ["/", "/auth/login", "/auth/signup"],
-    PROTECTED: ["/novels/create", "/profile", "/api/novels"],
-  };
+  // Rutas públicas
+  const PUBLIC_ROUTES = ["/", "/auth/login", "/auth/signup", "/novels/[id]"];
 
-  const isProtectedRoute = ROUTES.PROTECTED.some((route) =>
-    req.nextUrl.pathname.startsWith(route)
-  );
-  const isPublicRoute = ROUTES.PUBLIC.some((route) =>
+  // Si la ruta es pública, permitirla
+  const isPublicRoute = PUBLIC_ROUTES.some((route) =>
     req.nextUrl.pathname.startsWith(route)
   );
 
-  const isNovelAPI = req.nextUrl.pathname.startsWith("/api/novels");
-  const isGETMethod = req.method === "GET";
-  const isNonGETMethod = ["POST", "PUT", "DELETE"].includes(req.method);
-
-  // Permitir acceso público a solicitudes GET en /api/novels
-  if (isNovelAPI && isGETMethod) {
-    const response = NextResponse.next();
-    response.headers.set(
-      "Cache-Control",
-      "public, max-age=60, stale-while-revalidate=300"
-    );
-    return response;
+  // Si es una solicitud GET, permitirla para todas las rutas
+  if (req.method === "GET") {
+    return NextResponse.next();
   }
 
-  // Bloquear solicitudes no GET en /api/novels sin autenticación
-  if (isNovelAPI && isNonGETMethod && !token) {
-    return new NextResponse(
-      JSON.stringify({ error: "Authentication required for this action" }),
-      {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+  // Si la ruta es de tipo POST, PUT o DELETE
+  if (["POST", "PUT", "DELETE"].includes(req.method)) {
+    // Bloquear modificación de recursos sin token
+    if (!token) {
+      return new NextResponse(
+        JSON.stringify({ error: "Authentication required for this action" }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
   }
 
-  // Si no hay token y la ruta es protegida, redirigir al login
-  if (!token && isProtectedRoute) {
+  // Si la ruta está protegida y no hay token, redirigir al login
+  if (!token && !isPublicRoute) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
@@ -62,5 +50,6 @@ export const config = {
     "/auth/login",
     "/auth/signup",
     "/api/novels/:path*",
+    "/api/genres/:path*",
   ],
 };
