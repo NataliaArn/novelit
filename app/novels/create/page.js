@@ -18,24 +18,26 @@ export default function CreateNovelPage() {
   useEffect(() => {
     async function fetchGenres() {
       try {
-        const response = await fetch("/api/genres");
-        if (!response.ok) throw new Error("Failed to fetch genres");
+        const response = await fetch("/api/generes");
         const data = await response.json();
+        console.log("Genres fetched:", data);
         setGenres(data);
       } catch (err) {
         console.error("Error fetching genres:", err);
-        setError("Could not load genres. Please try again later.");
       }
     }
     fetchGenres();
   }, []);
 
   const toggleGenre = (genreId) => {
-    setSelectedGenres((prev) =>
-      prev.includes(genreId)
+    setSelectedGenres((prev) => {
+      const updatedGenres = prev.includes(genreId)
         ? prev.filter((id) => id !== genreId)
-        : [...prev, genreId]
-    );
+        : [...prev, genreId];
+
+      console.log("Updated selectedGenres:", updatedGenres);
+      return updatedGenres;
+    });
   };
 
   const handleSubmit = async (e) => {

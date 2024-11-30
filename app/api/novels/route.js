@@ -131,7 +131,9 @@ export async function POST(request) {
         synopsis,
         authorId: session.user.id, // Asociar el authorId desde la sesión
         genres: {
-          connect: genres.map((genreId) => ({ id: genreId })), // Conectar los géneros seleccionados
+          create: genres.map((genreId) => ({
+            genre: { connect: { id: genreId } },
+          })),
         },
       },
     });

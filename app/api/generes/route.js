@@ -3,6 +3,8 @@ import prisma from "@/lib/prisma";
 
 export async function GET() {
   try {
+    console.log("AA");
+
     // Obtener todos los géneros disponibles
     const genres = await prisma.genre.findMany();
     return NextResponse.json(genres);
