@@ -2,19 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getSession } from "next-auth/react";
 
 export default function CreateNovelPage() {
   const router = useRouter();
   const [session, setSession] = useState(null);
-
-  useEffect(() => {
-    async function fetchSession() {
-      const sessionData = await getSession();
-      setSession(sessionData);
-    }
-    fetchSession();
-  }, []);
 
   const [title, setTitle] = useState("");
   const [synopsis, setSynopsis] = useState("");
@@ -96,20 +87,6 @@ export default function CreateNovelPage() {
       setIsSubmitting(false);
     }
   };
-
-  // Redirigir si la sesión aún no está disponible
-  if (session === null) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="spinner">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!session) {
-    router.push("/auth/login"); // Redirigir a login si no hay sesión
-    return null;
-  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
