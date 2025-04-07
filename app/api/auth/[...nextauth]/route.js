@@ -10,8 +10,28 @@ export const authOptions = {
   session: {
     strategy: "jwt",
   },
-  jwt: {
-    secret: process.env.NEXTAUTH_SECRET,
+  jwt: {},
+  callbacks: {
+    async session({ session, token }) {
+      // Usamos el username del token para buscar el user en la base de datos
+      if (token?.username) {
+        const userFound = await prisma.user.findUnique({
+          where: { username: token.username },
+        });
+
+        if (userFound) {
+          session.user.id = userFound.id; // Añade el id del usuario a la sesión
+        }
+      }
+      return session;
+    },
+    async jwt({ token, user, account }) {
+      // Guardamos el username en el token cuando el usuario inicia sesión
+      if (user) {
+        token.username = user.username;
+      }
+      return token;
+    },
   },
   providers: [
     CredentialsProvider({
@@ -38,7 +58,7 @@ export const authOptions = {
 
         return {
           id: userFound.id,
-          name: userFound.username,
+          username: userFound.username,
           email: userFound.email,
           isAdmin: userFound.isAdmin,
         };
@@ -51,5 +71,4 @@ export const authOptions = {
 };
 
 const handler = NextAuth(authOptions);
-
 export { handler as GET, handler as POST };

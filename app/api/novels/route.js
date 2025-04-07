@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSession } from "next-auth/react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
 
 const MAX_TITLE_LENGTH = 100;
 const MAX_SYNOPSIS_LENGTH = 500;
@@ -93,7 +94,9 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     // Obtener la sesión del usuario
-    const session = await getSession();
+    const session = await getServerSession(authOptions);
+    console.log(session);
+
     if (!session) {
       // Si no hay sesión, responder con un error de autenticación
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -152,7 +155,9 @@ export async function POST(request) {
 // Método UPDATE para actualizar una novela
 export async function PUT(request) {
   try {
-    const session = await getSession();
+    const session = await getServerSession(authOptions); // Usamos getServerSession aquí
+    console.log(session);
+
     if (!session) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
@@ -220,7 +225,7 @@ export async function PUT(request) {
 // Método DELETE
 export async function DELETE(request) {
   try {
-    const session = await getSession();
+    const session = await getServerSession(authOptions); // Usamos getServerSession aquí
     if (!session) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }

@@ -7,6 +7,17 @@ export async function POST(request) {
     const data = await request.json();
     console.log("Request data:", data);
 
+    if (!data.email || !data.username || !data.password) {
+      return NextResponse.json(
+        { message: "Faltan datos requeridos" },
+        { status: 400 }
+      );
+    }
+
+    if (!data.email.includes("@")) {
+      return NextResponse.json({ message: "Email invalido" }, { status: 400 });
+    }
+
     const userFound = await prisma.user.findUnique({
       where: { email: data.email },
     });

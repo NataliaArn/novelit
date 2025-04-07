@@ -1,11 +1,12 @@
 "use client";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
 import ProfileButtons from "./components/ProfileButtons";
 import { redirect } from "next/navigation";
+import { useSession } from "next-auth/react";
 
-export default async function ProfilePage() {
-  const session = await getServerSession(authOptions);
+export default function ProfilePage() {
+  const { data: session, status } = useSession();
+  console.log(session);
 
   if (!session) {
     redirect("/auth/login");

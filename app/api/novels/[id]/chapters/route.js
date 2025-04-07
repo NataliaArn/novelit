@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getSession } from "next-auth/react";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../../../auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
 
 export async function GET(request, { params }) {
@@ -65,16 +66,15 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: "Novel not found" }, { status: 404 });
     }
 
-    const session = await getSession(); // Obtenemos la sesión con next-auth
+    const session = await getServerSession(authOptions);
 
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Verifica que el usuario autenticado sea el autor o un administrador
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { id: true, isAdmin: true },
+      where: { id: session.user.id }, // Usamos el id de la sesión
+      select: { id: true, isAdmin: true }, // Obtenemos id e isAdmin
     });
 
     if (!user) {
@@ -85,7 +85,6 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    // Crear nuevo capítulo
     const newChapter = await prisma.chapter.create({
       data: {
         novelId: parseInt(novelId),
@@ -126,15 +125,14 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: "Chapter not found" }, { status: 404 });
     }
 
-    const session = await getSession();
+    const session = await getServerSession(authOptions);
 
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Obtener usuario
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { id: session.user.id },
       select: { id: true, isAdmin: true },
     });
 
@@ -142,7 +140,6 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Verifica si el usuario es el autor o un administrador
     if (chapter.novel.authorId !== user.id && !user.isAdmin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }

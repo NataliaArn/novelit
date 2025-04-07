@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useParams } from "next/navigation"; // Importa useParams
 
 const NovelChapters = () => {
-  const router = useRouter();
-  const { id } = router.query;
+  const params = useParams(); // Usar useParams para obtener los parámetros
+  const { id } = params; // Obtener el id desde los parámetros
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
