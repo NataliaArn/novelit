@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import EditNovelButton from "./EditNovelButton";
 
 export default function NovelDetail() {
-  const params = useParams(); // Usa useParams para obtener los parámetros
-  const { id } = params; // Obtiene el id de los parámetros
+  const params = useParams();
+  const { id } = params;
   const [novel, setNovel] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -40,7 +41,6 @@ export default function NovelDetail() {
       <h1 className="text-2xl font-bold">{novel.title}</h1>
       <p className="text-gray-600">By: {novel.author.username}</p>
       <p className="text-sm text-gray-500">{novel.synopsis}</p>
-
       {novel.genres && novel.genres.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-4">
           {novel.genres.map((genreObj, index) => (
@@ -53,6 +53,7 @@ export default function NovelDetail() {
           ))}
         </div>
       )}
+      <EditNovelButton novel={novel} />
     </div>
   );
 }
