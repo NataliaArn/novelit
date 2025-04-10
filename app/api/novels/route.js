@@ -155,8 +155,7 @@ export async function POST(request) {
 // Método UPDATE para actualizar una novela
 export async function PUT(request) {
   try {
-    const session = await getServerSession(authOptions); // Usamos getServerSession aquí
-    console.log(session);
+    const session = await getServerSession(authOptions);
 
     if (!session) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -201,18 +200,39 @@ export async function PUT(request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 403 });
     }
 
+    // 1. Eliminar géneros existentes
+    await prisma.novelGenre.deleteMany({
+      where: { novelId },
+    });
+
+    // 2. Crear nuevas relaciones
+    await prisma.novelGenre.createMany({
+      data: genres.map((genreId) => ({ novelId, genreId })),
+      skipDuplicates: true,
+    });
+
+    // 3. Actualizar novela
     const updatedNovel = await prisma.novel.update({
       where: { id: novelId },
       data: {
         title,
         synopsis,
+      },
+      include: {
         genres: {
-          set: genres.map((genreId) => ({ id: genreId })),
+          include: {
+            genre: true,
+          },
         },
       },
     });
 
-    return NextResponse.json(updatedNovel);
+    const formattedNovel = {
+      ...updatedNovel,
+      genres: updatedNovel.genres.map((g) => g.genre.name),
+    };
+
+    return NextResponse.json(formattedNovel);
   } catch (error) {
     console.error("Error updating novel:", error);
     return NextResponse.json(
@@ -221,7 +241,6 @@ export async function PUT(request) {
     );
   }
 }
-
 // Método DELETE
 export async function DELETE(request) {
   try {

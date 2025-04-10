@@ -3,7 +3,8 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../../auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
 
-export async function GET(req, { params }) {
+export async function GET(req, props) {
+  const params = await props.params;
   try {
     const { id: novelId } = params;
 
@@ -41,7 +42,8 @@ export async function GET(req, { params }) {
   }
 }
 
-export async function POST(request, { params }) {
+export async function POST(request, props) {
+  const params = await props.params;
   try {
     const { id: novelId } = params;
     const body = await request.json();
@@ -104,7 +106,8 @@ export async function POST(request, { params }) {
   }
 }
 
-export async function DELETE(request, { params }) {
+export async function DELETE(request, props) {
+  const params = await props.params;
   try {
     const { id: novelId } = params;
     const body = await request.json();

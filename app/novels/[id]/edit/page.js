@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { use } from "react";
 
-export default function EditNovelPage({ params }) {
+export default function EditNovelPage(props) {
+  const params = use(props.params);
   const router = useRouter();
   const { id: novelId } = params;
 
@@ -25,7 +27,7 @@ export default function EditNovelPage({ params }) {
         const novelData = await response.json();
         setTitle(novelData.title);
         setSynopsis(novelData.synopsis);
-        setSelectedGenres(novelData.genres.map((g) => g.genre.id)); // Obtener solo los IDs de los géneros
+        setSelectedGenres(novelData.genres.map((g) => g.genre.id));
       } catch (err) {
         console.error("Error fetching novel:", err);
         setError(err.message);
