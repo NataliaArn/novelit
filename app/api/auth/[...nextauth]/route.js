@@ -20,11 +20,13 @@ export const authOptions = {
         });
 
         if (userFound) {
-          session.user.id = userFound.id; // Añade el id del usuario a la sesión
+          session.user.id = userFound.id; // Añade el id del usuario
+          session.user.isAdmin = userFound.isAdmin; // Añade isAdmin a la sesión
         }
       }
       return session;
     },
+
     async jwt({ token, user, account }) {
       // Guardamos el username en el token cuando el usuario inicia sesión
       if (user) {

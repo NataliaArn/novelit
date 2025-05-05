@@ -7,13 +7,11 @@ export default function EditNovelButton({ novel }) {
   const router = useRouter();
   const { data: session } = useSession();
 
-  console.log(session);
-
   if (!session) {
     return null;
   }
 
-  if (session.user.id != novel.author.id || !session.user.isAdmin) {
+  if (session.user.id != novel.authorId && !session.user.isAdmin) {
     return null;
   }
 

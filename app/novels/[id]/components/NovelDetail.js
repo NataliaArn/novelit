@@ -36,6 +36,8 @@ export default function NovelDetail() {
     return <p>Novel not found.</p>;
   }
 
+  console.log(novel);
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">{novel.title}</h1>
