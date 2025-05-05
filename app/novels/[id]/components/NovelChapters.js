@@ -1,20 +1,18 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation"; // Importa useParams
+import AddChapterButton from "./AddChapterButton";
 
-const NovelChapters = () => {
-  const params = useParams(); // Usar useParams para obtener los parámetros
-  const { id } = params; // Obtener el id desde los parámetros
+const NovelChapters = ({ novel }) => {
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!id) return;
+    if (!novel?.id) return;
 
     const fetchChapters = async () => {
       try {
-        const response = await fetch(`/api/novels/${id}/chapters`);
+        const response = await fetch(`/api/novels/${novel.id}/chapters`);
         if (!response.ok) {
           throw new Error("Failed to fetch chapters");
         }
@@ -28,18 +26,14 @@ const NovelChapters = () => {
     };
 
     fetchChapters();
-  }, [id]);
+  }, [novel?.id]);
 
-  if (loading) {
-    return <p>Cargando capítulos...</p>;
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
+  if (loading) return <p>Cargando capítulos...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <div>
+      <AddChapterButton novel={novel} />
       <h2 className="text-xl font-bold mb-4">Capítulos</h2>
       <div className="space-y-4">
         {chapters.length === 0 ? (
@@ -49,7 +43,7 @@ const NovelChapters = () => {
             <div key={chapter.id} className="border rounded-lg p-4 shadow-md">
               <h3 className="text-lg font-semibold">{chapter.title}</h3>
               <a
-                href={`/novels/${id}/chapters/${chapter.id}`}
+                href={`/novels/${novel.id}/chapters/${chapter.id}`}
                 className="text-blue-600 hover:text-blue-800"
               >
                 Leer capítulo

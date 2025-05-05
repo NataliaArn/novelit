@@ -1,42 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import EditNovelButton from "./EditNovelButton";
 
-export default function NovelDetail() {
-  const params = useParams();
-  const { id } = params;
-  const [novel, setNovel] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!id) return;
-
-    async function fetchNovelDetails() {
-      setLoading(true);
-      const res = await fetch(`/api/novels/${id}`);
-      const data = await res.json();
-
-      if (res.ok) {
-        setNovel(data);
-      } else {
-        alert(data.error || "Error fetching novel details");
-      }
-      setLoading(false);
-    }
-
-    fetchNovelDetails();
-  }, [id]);
-
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (!novel) {
-    return <p>Novel not found.</p>;
-  }
-
-  console.log(novel);
+export default function NovelDetail({ novel }) {
+  if (!novel) return <p>Loading...</p>;
 
   return (
     <div className="space-y-6">

@@ -48,6 +48,7 @@ export async function POST(request, props) {
     const { id: novelId } = params;
     const body = await request.json();
 
+    console.log("Received body:", body);
     if (!body.title || !body.content) {
       return NextResponse.json(
         { error: "Title and content are required" },
@@ -75,8 +76,8 @@ export async function POST(request, props) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id }, // Usamos el id de la sesión
-      select: { id: true, isAdmin: true }, // Obtenemos id e isAdmin
+      where: { id: session.user.id },
+      select: { id: true, isAdmin: true },
     });
 
     if (!user) {
