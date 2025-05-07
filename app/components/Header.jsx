@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { signOut } from "next-auth/react";
-import { getSession } from "next-auth/react";
+import { signOut, getSession } from "next-auth/react";
 
 export default function Header() {
   const [session, setSession] = useState(null);
@@ -17,9 +16,11 @@ export default function Header() {
   }, []);
 
   return (
-    <nav className="flex justify-between items-center bg-gray-950 text-white px-24 py-3">
-      <h1 className="text-xl font-bold">Novelit</h1>
-      <ul className="flex gap-x-2">
+    <nav className="flex flex-wrap items-center justify-between bg-gray-950 text-white px-6 md:px-24 py-3">
+      <div className="w-full md:w-auto mb-2 md:mb-0">
+        <h1 className="text-xl font-bold">Novelit</h1>
+      </div>
+      <ul className="w-full md:w-auto flex flex-wrap justify-end gap-2">
         {!session ? (
           <>
             <li>
@@ -34,6 +35,9 @@ export default function Header() {
           </>
         ) : (
           <>
+            <li>
+              <Link href="/">Home</Link>
+            </li>
             <li>
               <Link href="/novels/create">Upload</Link>
             </li>
