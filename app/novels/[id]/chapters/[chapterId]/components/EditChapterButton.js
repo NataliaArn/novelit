@@ -8,6 +8,7 @@ export default function EditChapterButton() {
   const { id: novelId, chapterId } = useParams();
   const { data: session } = useSession();
   const [authorId, setAuthorId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchAuthorId() {
