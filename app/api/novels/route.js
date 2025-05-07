@@ -270,6 +270,11 @@ export async function DELETE(request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 403 });
     }
 
+    // Eliminar relaciones en NovelGenre
+    await prisma.novelGenre.deleteMany({
+      where: { novelId },
+    });
+
     // Eliminar la novela
     await prisma.novel.delete({
       where: { id: novelId },

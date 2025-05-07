@@ -121,7 +121,13 @@ export async function DELETE(request, props) {
     const chapter = await prisma.chapter.findUnique({
       where: {
         id: parseInt(chapterId),
-        novelId: parseInt(novelId),
+      },
+      include: {
+        novel: {
+          select: {
+            authorId: true,
+          },
+        },
       },
     });
 

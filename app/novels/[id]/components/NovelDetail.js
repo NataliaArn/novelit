@@ -1,4 +1,5 @@
 "use client";
+import DeleteNovelButton from "./DeleteNovelButton";
 import EditNovelButton from "./EditNovelButton";
 
 export default function NovelDetail({ novel }) {
@@ -22,6 +23,7 @@ export default function NovelDetail({ novel }) {
         </div>
       )}
       <EditNovelButton novel={novel} />
+      <DeleteNovelButton novel={novel} />
     </div>
   );
 }
