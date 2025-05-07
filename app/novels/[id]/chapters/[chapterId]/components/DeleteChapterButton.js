@@ -2,12 +2,36 @@
 
 import { useRouter, useParams } from "next/navigation";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 export default function DeleteChapterButton() {
   const { id: novelId, chapterId } = useParams();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { data: session } = useSession();
+  const [authorId, setAuthorId] = useState(null);
+
+  useEffect(() => {
+    async function fetchAuthorId() {
+      const res = await fetch(`/api/novels/${novelId}/author`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setAuthorId(data.authorId);
+      setLoading(false);
+    }
+
+    fetchAuthorId();
+  }, [novelId]);
+
+  if (loading || !session) return null;
+
+  const userId = session.user.id;
+  const isAdmin = session.user.isAdmin;
+
+  if (userId !== authorId && !isAdmin) {
+    return null;
+  }
 
   const handleDelete = async () => {
     const confirmed = confirm(
