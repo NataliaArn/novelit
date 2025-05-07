@@ -1,9 +1,8 @@
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
-import { useState } from "react";
-import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 export default function DeleteChapterButton() {
   const { id: novelId, chapterId } = useParams();
