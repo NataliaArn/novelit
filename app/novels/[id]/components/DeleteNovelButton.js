@@ -1,11 +1,21 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 export default function DeleteNovelButton({ novel }) {
   const router = useRouter();
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { data: session } = useSession();
+
+  if (!session) {
+    return null;
+  }
+
+  if (session.user.id != novel.authorId && !session.user.isAdmin) {
+    return null;
+  }
 
   const handleDelete = async () => {
     const confirmed = window.confirm(
