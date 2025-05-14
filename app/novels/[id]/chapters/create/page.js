@@ -45,37 +45,81 @@ export default function NewChapterPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-8 space-y-4">
-      <h1 className="text-2xl font-bold">Nuevo Capítulo</h1>
-      {error && <p className="text-red-500">{error}</p>}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          placeholder="Título"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-          className="w-full p-2 border rounded"
-        />
-        <textarea
-          placeholder="Contenido"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          required
-          className="w-full p-2 border rounded h-40"
-        />
-        <textarea
-          placeholder="Notas del autor (opcional)"
-          value={authorNotes}
-          onChange={(e) => setAuthorNotes(e.target.value)}
-          className="w-full p-2 border rounded h-24"
-        />
-        <button
-          type="submit"
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        >
-          Crear Capítulo
-        </button>
+    <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <h1 className="text-3xl font-bold mb-6 text-center">Nuevo Capítulo</h1>
+
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+      >
+        {error && (
+          <div
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+            role="alert"
+          >
+            {error}
+          </div>
+        )}
+
+        <div className="mb-4">
+          <label
+            htmlFor="title"
+            className="block text-gray-700 text-sm font-bold mb-2"
+          >
+            Título
+          </label>
+          <input
+            id="title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            placeholder="Título del capítulo"
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label
+            htmlFor="content"
+            className="block text-gray-700 text-sm font-bold mb-2"
+          >
+            Contenido
+          </label>
+          <textarea
+            id="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-40"
+            placeholder="Escribe el contenido del capítulo"
+            required
+          />
+        </div>
+
+        <div className="mb-6">
+          <label
+            htmlFor="authorNotes"
+            className="block text-gray-700 text-sm font-bold mb-2"
+          >
+            Notas del autor (opcional)
+          </label>
+          <textarea
+            id="authorNotes"
+            value={authorNotes}
+            onChange={(e) => setAuthorNotes(e.target.value)}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-24"
+            placeholder="Notas personales, ideas o comentarios para los lectores"
+          />
+        </div>
+
+        <div className="flex items-center justify-center">
+          <button
+            type="submit"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50"
+          >
+            Crear Capítulo
+          </button>
+        </div>
       </form>
     </div>
   );

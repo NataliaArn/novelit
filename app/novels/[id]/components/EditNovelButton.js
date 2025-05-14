@@ -18,7 +18,7 @@ export default function EditNovelButton({ novel }) {
   return (
     <button
       onClick={() => router.push(`/novels/${novel.id}/edit`)}
-      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-5 rounded-full shadow-md transition-all duration-200 ease-in-out text-sm sm:text-base"
     >
       Editar Novela
     </button>

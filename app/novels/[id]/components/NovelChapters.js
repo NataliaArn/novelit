@@ -33,8 +33,12 @@ const NovelChapters = ({ novel }) => {
 
   return (
     <div>
-      <AddChapterButton novel={novel} />
       <h2 className="text-xl font-bold mb-4">Capítulos</h2>
+
+      <div className="mb-4">
+        <AddChapterButton novel={novel} />
+      </div>
+
       <div className="space-y-4">
         {chapters.length === 0 ? (
           <p>No hay capítulos por ahora.</p>

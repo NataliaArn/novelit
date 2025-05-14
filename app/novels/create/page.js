@@ -122,7 +122,7 @@ export default function CreateNovelPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="Enter novel title"
+            placeholder="Escribe el título de la novela"
             required
           />
         </div>
@@ -139,14 +139,14 @@ export default function CreateNovelPage() {
             value={synopsis}
             onChange={(e) => setSynopsis(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32"
-            placeholder="Write a brief synopsis of your novel"
+            placeholder="Escribe una breve sinopsis de tu novela"
             required
           />
         </div>
 
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
-            Selecciona generos
+            Selecciona géneros
           </label>
           <div className="flex flex-wrap gap-2">
             {genres.map((genre) => (
@@ -170,7 +170,7 @@ export default function CreateNovelPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50"
           >
             {isSubmitting ? "Creando..." : "Crear novela"}
           </button>

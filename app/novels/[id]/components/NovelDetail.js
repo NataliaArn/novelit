@@ -8,8 +8,9 @@ export default function NovelDetail({ novel }) {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">{novel.title}</h1>
-      <p className="text-gray-600">By: {novel.author.username}</p>
+      <p className="text-gray-600">Autor: {novel.author.username}</p>
       <p className="text-sm text-gray-500">{novel.synopsis}</p>
+
       {novel.genres && novel.genres.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-4">
           {novel.genres.map((genreObj, index) => (
@@ -22,8 +23,11 @@ export default function NovelDetail({ novel }) {
           ))}
         </div>
       )}
-      <EditNovelButton novel={novel} />
-      <DeleteNovelButton novel={novel} />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 px-4 sm:px-0 max-w-md mx-auto sm:mx-0 sm:ml-4">
+        <EditNovelButton novel={novel} />
+        <DeleteNovelButton novel={novel} />
+      </div>
     </div>
   );
 }

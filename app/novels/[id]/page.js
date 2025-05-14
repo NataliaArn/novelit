@@ -37,9 +37,11 @@ export default function NovelPage({ params }) {
     return <p>Novel not found.</p>;
   }
   return (
-    <div className="space-y-6">
-      <NovelDetail novel={novel} />
-      <NovelChapters novel={novel} />
+    <div className="min-h-screen flex flex-col">
+      <main className="flex-1 p-6 bg-gray-100 space-y-6">
+        <NovelDetail novel={novel} />
+        <NovelChapters novel={novel} />
+      </main>
     </div>
   );
 }

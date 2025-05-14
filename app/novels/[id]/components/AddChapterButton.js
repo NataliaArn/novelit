@@ -18,7 +18,7 @@ export default function AddChapterButton({ novel }) {
   return (
     <button
       onClick={() => router.push(`/novels/${novel.id}/chapters/create`)}
-      className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+      className="bg-amber-800 hover:bg-amber-900 text-white font-semibold py-2 px-5 rounded-full shadow-md transition-all duration-200 ease-in-out text-sm sm:text-base"
     >
       Añadir Capítulo
     </button>

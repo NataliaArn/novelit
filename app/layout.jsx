@@ -18,12 +18,11 @@ const geistMono = localFont({
 
 export default function RootLayout({ children, session }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-100 min-h-screen`}
       >
         <Header />
-
         <SessionProvider session={session}>{children}</SessionProvider>
       </body>
     </html>

@@ -73,7 +73,7 @@ export default function DeleteChapterButton() {
       <button
         onClick={handleDelete}
         disabled={loading}
-        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+        className="bg-lime-700 hover:bg-lime-800 text-white font-semibold py-2 px-5 rounded-full shadow-md transition-all duration-200 ease-in-out text-sm sm:text-base"
       >
         {loading ? "Eliminando..." : "Eliminar capítulo"}
       </button>

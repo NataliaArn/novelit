@@ -49,12 +49,12 @@ export default function DeleteNovelButton({ novel }) {
   };
 
   return (
-    <div className="mt-4">
-      {error && <p className="text-red-600">{error}</p>}
+    <div className="w-full">
+      {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
       <button
         onClick={handleDelete}
         disabled={loading}
-        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50"
+        className="w-full bg-lime-700 hover:bg-lime-800 text-white font-semibold py-2 px-5 rounded-full shadow-md transition-all duration-200 ease-in-out text-sm sm:text-base"
       >
         {loading ? "Eliminando..." : `Eliminar "${novel.title}"`}
       </button>
