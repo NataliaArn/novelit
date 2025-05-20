@@ -4,10 +4,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { signOut, getSession } from "next-auth/react";
 
+const NAV_HEIGHT = 64;
+
 export default function Header() {
   const [session, setSession] = useState(null);
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+
+  const userId = session?.user?.id;
 
   useEffect(() => {
     async function fetchSession() {
@@ -28,21 +32,26 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
+  useEffect(() => {
+    const content = document.getElementById("page-content");
+    if (content) {
+      content.style.paddingTop = visible ? `${NAV_HEIGHT}px` : "0";
+    }
+  }, [visible]);
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ${
         visible ? "translate-y-0" : "-translate-y-full"
       } bg-gray-950 text-white px-6 md:px-24 py-3`}
     >
-      <div className="flex flex-wrap items-center justify-between">
-        <div className="w-full md:w-auto mb-2 md:mb-0">
-          <h1 className="text-xl font-bold">
-            <Link href="/" className="hover:no-underline">
-              Novelit
-            </Link>
-          </h1>
-        </div>
-        <ul className="w-full md:w-auto flex flex-wrap justify-end gap-2">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-2">
+        <h1 className="text-xl font-bold">
+          <Link href="/" className="hover:no-underline">
+            Novelit
+          </Link>
+        </h1>
+        <ul className="flex flex-wrap justify-end gap-3">
           {!session ? (
             <>
               <li>
@@ -64,7 +73,7 @@ export default function Header() {
                 <Link href="/novels/create">Upload</Link>
               </li>
               <li>
-                <Link href="/profile">Profile</Link>
+                <Link href={`/profile/${userId}`}>Profile</Link>
               </li>
               <li>
                 <button

@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import DeleteNovelButton from "./DeleteNovelButton";
 import EditNovelButton from "./EditNovelButton";
 
@@ -8,7 +9,15 @@ export default function NovelDetail({ novel }) {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">{novel.title}</h1>
-      <p className="text-gray-600">Autor: {novel.author.username}</p>
+      <p className="text-gray-600">
+        Autor:{" "}
+        <Link
+          href={`/profile/${novel.author.id}`}
+          className="text-blue-500 hover:underline"
+        >
+          {novel.author.username}
+        </Link>
+      </p>
       <p className="text-sm text-gray-500">{novel.synopsis}</p>
 
       {novel.genres && novel.genres.length > 0 && (

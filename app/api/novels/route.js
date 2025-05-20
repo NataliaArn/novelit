@@ -44,6 +44,7 @@ export async function GET(request) {
         author: {
           select: {
             username: true,
+            id: true,
           },
         },
         genres: {

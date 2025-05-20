@@ -12,7 +12,7 @@ export async function GET(req, { params }) {
     const novel = await prisma.novel.findUnique({
       where: { id: parseInt(id) },
       include: {
-        author: { select: { username: true } },
+        author: { select: { username: true, id: true } },
         genres: { include: { genre: true } },
       },
     });

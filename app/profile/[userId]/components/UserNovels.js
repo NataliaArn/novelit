@@ -1,64 +1,57 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 
-export default function RecentNovels() {
-  const [novels, setNovels] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
+export default function UserNovels() {
+  const { userId } = useParams(); // Obtener el ID del usuario
+  const [novels, setNovels] = useState([]); // Lista de novelas
+  const [loading, setLoading] = useState(true); // Estado de carga
+  const [error, setError] = useState(null); // Estado de error
+  const [currentPage, setCurrentPage] = useState(1); // Página actual
+  const [totalPages, setTotalPages] = useState(0); // Total de páginas calculado
   const ITEMS_PER_PAGE = 9;
 
   useEffect(() => {
     let isMounted = true;
-    const controller = new AbortController(); // Controlador para cancelar la petición
-
-    // Función asíncrona para obtener las novelas del servidor
+    const controller = new AbortController();
 
     async function fetchNovels() {
       try {
         setLoading(true);
         setError(null);
+
         const res = await fetch(
-          `/api/novels?page=${currentPage}&limit=${ITEMS_PER_PAGE}`,
+          `/api/users/${userId}/novels?page=${currentPage}&limit=${ITEMS_PER_PAGE}`,
           {
-            headers: {
-              Accept: "application/json",
-            },
-            signal: AbortSignal.timeout(8000), // Timeout de 8 segundos
-            cache: "no-cache", // Desactivar caché del navegador para datos en tiempo real
+            headers: { Accept: "application/json" },
+            signal: controller.signal,
+            cache: "no-cache",
           }
         );
 
-        if (!res.ok) {
-          throw new Error(`Error HTTP: ${res.status}`);
-        }
-
+        if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
         const data = await res.json();
 
-        // Validación de la estructura de datos recibida
         if (!data.novels || !Array.isArray(data.novels)) {
           throw new Error("Formato de datos inválido");
         }
 
         if (isMounted) {
           setNovels(data.novels);
-          setTotalPages(data.pagination.pages);
+          setTotalPages(data.pagination.pages || 1);
         }
       } catch (err) {
         if (isMounted) {
           setError(
             err.name === "AbortError"
-              ? "La solicitud tardó demasiado. Por favor, intente nuevamente."
-              : "Error al cargar las novelas. Por favor, intente más tarde."
+              ? "La solicitud tardó demasiado. Intente nuevamente."
+              : "Error al cargar las novelas del usuario."
           );
-          console.error("Error al obtener novelas:", err);
+          console.error("Error al obtener novelas del usuario:", err);
         }
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       }
     }
 
@@ -66,54 +59,42 @@ export default function RecentNovels() {
 
     return () => {
       isMounted = false;
-      controller.abort(); // Cancelar la petición si el componente se desmonta
+      controller.abort();
     };
-  }, [currentPage]);
+  }, [userId, currentPage]);
 
-  /**
-   * Cambio de página y hace scroll al inicio
-   * @param {number} newPage - Número de la nueva página
-   */
   const handlePageChange = (newPage) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     setCurrentPage(newPage);
   };
-
-  // Componente para la paginación
+  // Componente para los controles de paginación
   const PaginationControls = () => {
     const getPageNumbers = () => {
       let pages = [];
-      const maxVisiblePages = 4; // Número de páginas consecutivas a mostrar
+      const maxVisiblePages = 4;
 
+      // Si hay pocas páginas, las mostramos todas
       if (totalPages <= maxVisiblePages + 2) {
         return Array.from({ length: totalPages }, (_, i) => i + 1);
       }
 
-      // Lógica para páginas cerca del inicio
+      // Mostrar primeras páginas + elipsis + última
       if (currentPage <= maxVisiblePages) {
-        for (let i = 1; i <= maxVisiblePages; i++) {
-          pages.push(i);
-        }
+        for (let i = 1; i <= maxVisiblePages; i++) pages.push(i);
         pages.push("...");
         pages.push(totalPages);
-      }
-      // Lógica para páginas cerca del final
-      else if (currentPage > totalPages - maxVisiblePages) {
+      } else if (currentPage > totalPages - maxVisiblePages) {
         pages.push(1);
         pages.push("...");
         for (let i = totalPages - maxVisiblePages + 1; i <= totalPages; i++) {
           pages.push(i);
         }
-      }
-      // Lógica para páginas en el medio
-      else {
-        pages.push(1);
-        pages.push("...");
+      } else {
+        pages.push(1, "...");
         for (let i = currentPage - 1; i <= currentPage + 1; i++) {
           pages.push(i);
         }
-        pages.push("...");
-        pages.push(totalPages);
+        pages.push("...", totalPages);
       }
 
       return pages;
@@ -125,7 +106,6 @@ export default function RecentNovels() {
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
           className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
-          aria-label="Página anterior"
         >
           Anterior
         </button>
@@ -140,14 +120,11 @@ export default function RecentNovels() {
               <button
                 key={page}
                 onClick={() => handlePageChange(page)}
-                className={`w-10 h-10 flex items-center justify-center rounded transition-colors
-                ${
+                className={`w-10 h-10 flex items-center justify-center rounded transition-colors ${
                   currentPage === page
                     ? "bg-blue-500 text-white"
                     : "bg-gray-200 hover:bg-gray-300"
                 }`}
-                aria-label={`Ir a página ${page}`}
-                aria-current={currentPage === page ? "page" : undefined}
               >
                 {page}
               </button>
@@ -159,7 +136,6 @@ export default function RecentNovels() {
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
-          aria-label="Página siguiente"
         >
           Siguiente
         </button>
@@ -167,42 +143,35 @@ export default function RecentNovels() {
     );
   };
 
-  // Loading con skeleton
+  // Estado de carga: mostrar esqueleto de tarjetas
   if (loading) {
     return (
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Novelas recientes</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(ITEMS_PER_PAGE)].map((_, index) => (
-            <div
-              key={index}
-              className="border rounded-lg p-4 bg-white shadow-md animate-pulse"
-            >
-              <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-              <div className="h-16 bg-gray-200 rounded mb-3"></div>
-              <div className="flex gap-2 mb-3">
-                <div className="h-6 bg-gray-200 rounded w-16"></div>
-                <div className="h-6 bg-gray-200 rounded w-16"></div>
-              </div>
-              <div className="border-t pt-2 flex justify-between items-center">
-                <div className="h-4 bg-gray-200 rounded w-24"></div>
-                <div className="h-4 bg-gray-200 rounded w-16"></div>
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {[...Array(ITEMS_PER_PAGE)].map((_, index) => (
+          <div
+            key={index}
+            className="border rounded-lg p-4 bg-white shadow-md animate-pulse"
+          >
+            <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+            <div className="h-16 bg-gray-200 rounded mb-3"></div>
+            <div className="flex gap-2 mb-3">
+              <div className="h-6 bg-gray-200 rounded w-16"></div>
+              <div className="h-6 bg-gray-200 rounded w-16"></div>
             </div>
-          ))}
-        </div>
+            <div className="border-t pt-2 flex justify-between items-center">
+              <div className="h-4 bg-gray-200 rounded w-24"></div>
+              <div className="h-4 bg-gray-200 rounded w-16"></div>
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
 
-  // Manejo de errores
   if (error) {
     return (
-      <div
-        role="alert"
-        className="text-center text-red-500 p-4 border border-red-200 rounded-lg bg-red-50"
-      >
+      <div className="text-center text-red-500 p-4 border border-red-200 bg-red-50 rounded">
         {error}
       </div>
     );
@@ -210,22 +179,14 @@ export default function RecentNovels() {
 
   if (novels.length === 0) {
     return (
-      <div className="text-center text-gray-500 p-4 border border-gray-200 rounded-lg">
-        No hay novelas disponibles en este momento.
+      <div className="text-center text-gray-500 p-4 border border-gray-200 rounded">
+        Este usuario no ha creado ninguna novela aún.
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="text-2xl font-bold">
-        <Link
-          href="/novels/create"
-          className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-1.5 px-3 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-1 transition-all duration-200"
-        >
-          Crear novela
-        </Link>
-      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {novels.map((novel) => (
           <article
@@ -233,6 +194,7 @@ export default function RecentNovels() {
             className="border rounded-lg p-4 bg-white shadow-md hover:shadow-lg transition-all duration-300 flex flex-col"
           >
             <h2 className="text-lg font-bold line-clamp-1">{novel.title}</h2>
+
             <p className="text-gray-600 mb-2">
               Por:{" "}
               <Link
@@ -242,25 +204,28 @@ export default function RecentNovels() {
                 {novel.author.username}
               </Link>
             </p>
+
             <p className="text-gray-500 text-sm mb-3 line-clamp-2 flex-grow">
               {novel.synopsis}
             </p>
-            {novel.genres && novel.genres.length > 0 && (
+
+            {novel.genres?.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-3">
-                {novel.genres.map((genreObj, index) => (
+                {novel.genres.map((g, index) => (
                   <span
                     key={index}
                     className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"
                   >
-                    {genreObj.genre.name}
+                    {g.genre.name}
                   </span>
                 ))}
               </div>
             )}
+
             <div className="flex justify-between items-center mt-2 pt-2 border-t">
               <Link
                 href={`/novels/${novel.id}`}
-                className="text-blue-500 hover:text-blue-700 transition-colors font-medium"
+                className="text-blue-500 hover:text-blue-700 font-medium"
               >
                 Leer novela
               </Link>
@@ -276,8 +241,8 @@ export default function RecentNovels() {
       {totalPages > 1 && <PaginationControls />}
 
       <div className="text-center text-gray-500 text-sm">
-        Mostrando {novels.length} novelas de la página {currentPage} de{" "}
-        {totalPages}
+        Mostrando {novels.length} novelas del usuario (página {currentPage} de{" "}
+        {totalPages})
       </div>
     </div>
   );
