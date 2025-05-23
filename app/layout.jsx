@@ -10,7 +10,9 @@ export default function RootLayout({ children, session }) {
       <body className="bg-gray-100 min-h-screen">
         <Header />
         <SessionProvider session={session}>
-          <div id="page-content">{children}</div>
+          <div id="page-content" className="!pt-[82px]">
+            {children}
+          </div>
         </SessionProvider>
       </body>
     </html>

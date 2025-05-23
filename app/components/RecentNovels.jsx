@@ -175,7 +175,9 @@ export default function RecentNovels() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Novelas recientes</h1>
+        <button className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-1.5 px-3 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-1 transition-all duration-200">
+          Crear novela
+        </button>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(ITEMS_PER_PAGE)].map((_, index) => (
             <div

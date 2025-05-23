@@ -49,7 +49,7 @@ function SignupPage() {
   });
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
       <form
         onSubmit={onSubmit}
         className="bg-white p-6 rounded shadow-md w-full max-w-md"
