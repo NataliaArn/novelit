@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function RecentNovels() {
   const [novels, setNovels] = useState([]);
@@ -9,6 +11,8 @@ export default function RecentNovels() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const ITEMS_PER_PAGE = 9;
+  const { data: session } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
     let isMounted = true;
@@ -219,12 +223,18 @@ export default function RecentNovels() {
   return (
     <div className="space-y-6">
       <div className="text-2xl font-bold">
-        <Link
-          href="/novels/create"
+        <button
+          onClick={() => {
+            if (!session) {
+              router.push("auth/login");
+            } else {
+              router.push("/novels/create");
+            }
+          }}
           className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-1.5 px-3 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-1 transition-all duration-200"
         >
           Crear novela
-        </Link>
+        </button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {novels.map((novel) => (
